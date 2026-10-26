@@ -1,0 +1,3 @@
+- insert:
+    - id: plugins-folders
+      name: '@dsh-user/dsh-plugins-folders'

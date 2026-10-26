@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Plugin folders">
+  <defs>
+    <linearGradient id="pf-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4c9bf0"/>
+      <stop offset="1" stop-color="#2470c8"/>
+    </linearGradient>
+    <linearGradient id="pf-tab" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7cc0ff"/>
+      <stop offset="1" stop-color="#4f9ae8"/>
+    </linearGradient>
+  </defs>
+  <path d="M6 16a4 4 0 0 1 4-4h12.6c1.3 0 2.5.6 3.3 1.7l3 4.3H54a4 4 0 0 1 4 4v26a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4V16Z" fill="url(#pf-tab)" opacity="0.55"/>
+  <path d="M6 24a5 5 0 0 1 5-5h42a5 5 0 0 1 5 5v24a5 5 0 0 1-5 5H11a5 5 0 0 1-5-5V24Z" fill="url(#pf-body)"/>
+  <g fill="#ffffff" opacity="0.92">
+    <rect x="17" y="31" width="13" height="3.2" rx="1.6"/>
+    <rect x="17" y="38" width="20" height="3.2" rx="1.6"/>
+    <rect x="17" y="45" width="9" height="3.2" rx="1.6"/>
+  </g>
+  <circle cx="45" cy="41" r="7" fill="#ffffff" opacity="0.22"/>
+  <path d="M42.2 41h5.6M45 38.2v5.6" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,55 @@
+{
+  "name": "@dsh-user/dsh-plugins-folders",
+  "version": "1.1.0",
+  "description": "在插件栏里用文件夹给已安装插件分类：分组、开关、批量、搜索、拖动排序、卸载记录一键重装。",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "assets/icon-180.png",
+    "README.md",
+    "README.en.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "icon": "icon.svg",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "dsh",
+    "plugin-manager",
+    "folders",
+    "organize",
+    "ui"
+  ],
+  "author": "awaYFawa",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/awaYFawa/dsh-plugins-folders.git"
+  },
+  "homepage": "https://github.com/awaYFawa/dsh-plugins-folders#readme",
+  "bugs": {
+    "url": "https://github.com/awaYFawa/dsh-plugins-folders/issues"
+  }
+}
