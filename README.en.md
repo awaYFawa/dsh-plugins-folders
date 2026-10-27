@@ -1,5 +1,7 @@
 # dsh-plugins-folders — folders for your DSH plugin list
 
+**English** | [中文](README.md)
+
 A folder layer for the **Plugins** page of DeepSeek Harness: sort installed plugins into groups, flip a whole group on or off, search across groups, drag to reorder, and reinstall anything you removed from its uninstall record.
 
 > After a few dozen plugins the list turns into an ever-growing conveyor belt. This plugin adds your own shelving on top of it — it never changes what a plugin does, only how the page presents it.
