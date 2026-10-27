@@ -1,6 +1,6 @@
 {
   "name": "@dsh-user/dsh-plugins-folders",
-  "version": "1.1.0",
+  "version": "1.2.2",
   "description": "在插件栏里用文件夹给已安装插件分类：分组、开关、批量、搜索、拖动排序、卸载记录一键重装。",
   "type": "module",
   "main": "index.js",
@@ -15,6 +15,7 @@
     "index.js",
     "client.js",
     "cordis.patch.yml",
+    "restart.ps1",
     "locale/*.json",
     "icon.svg",
     "assets/icon-180.png",

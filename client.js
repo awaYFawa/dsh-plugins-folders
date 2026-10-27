@@ -94,6 +94,11 @@ window.__ModuleLoader__.load({
         removeRecord: "移除记录",
         reinstallHint: "按卸载前的安装地址重新安装",
         uninstallRecorded: "已记入卸载记录，可从这里重新安装",
+        restart: "重启 Harness",
+        restartBusy: "正在重启…",
+        restartWaiting: "等 Harness 起来后自动刷新",
+        restartFailed: "重启没成功：",
+        restartTimeout: "等太久没等到 Harness，手动刷新一下页面吧",
       },
       en: {
         launcher: "Plugin folders",
@@ -155,6 +160,11 @@ window.__ModuleLoader__.load({
         removeRecord: "Remove entry",
         reinstallHint: "Reinstall from the address recorded at uninstall",
         uninstallRecorded: "Recorded — you can reinstall it from here",
+        restart: "Restart Harness",
+        restartBusy: "Restarting…",
+        restartWaiting: "Waiting for Harness, then reloading",
+        restartFailed: "Restart failed: ",
+        restartTimeout: "Harness never came back — refresh this page by hand",
       },
     };
 
@@ -437,11 +447,28 @@ window.__ModuleLoader__.load({
       "@keyframes pf-drawer-in{from{opacity:0;transform:translateX(44px)}to{opacity:1;transform:none}}",
       ".pf-drawer-head{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--dsw-alias-border-l1)}",
       ".pf-drawer-head svg{color:var(--dsw-alias-brand-primary);flex:none}",
-      ".pf-drawer-title{font-size:14px;font-weight:600;flex:1 1 auto;min-width:0}",
+      ".pf-drawer-title{font-size:14px;font-weight:600;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
       ".pf-icon-btn{appearance:none;border:1px solid transparent;background:transparent;color:var(--dsw-alias-label-secondary);border-radius:8px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:background-color .16s ease,color .16s ease}",
       ".pf-icon-btn:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary) 8%,transparent);color:var(--dsw-alias-label-primary)}",
       ".pf-icon-btn:disabled{opacity:.45;cursor:default}",
-      ".pf-drawer-body{flex:1 1 auto;overflow:auto;padding:12px 14px 26px}",
+      ".pf-restart{position:relative;flex:none;margin-left:-4px}",
+      ".pf-restart-btn{appearance:none;display:inline-flex;align-items:center;gap:5px;border:1px solid var(--dsw-alias-border-l2);background:transparent;color:var(--dsw-alias-label-primary);border-radius:8px;padding:4px 9px;font-size:12px;line-height:1.4;cursor:pointer;white-space:nowrap;transition:background-color .16s ease,border-color .16s ease,transform .12s ease}",
+      ".pf-restart-btn:hover{background:color-mix(in srgb,var(--dsw-alias-brand-primary) 10%,transparent);border-color:var(--dsw-alias-brand-primary)}",
+      ".pf-restart-btn:active{transform:scale(.97)}",
+      ".pf-restart-btn:disabled{opacity:.6;cursor:default}",
+      ".pf-restart-btn.is-busy{color:var(--dsw-alias-brand-primary);border-color:var(--dsw-alias-brand-primary)}",
+      ".pf-restart-pop{position:absolute;right:0;top:calc(100% + 8px);z-index:30;width:244px;display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid var(--dsw-alias-border-l2);border-radius:10px;background:var(--dsw-alias-bg-overlay,var(--dsw-alias-bg-layer-1,#fff));box-shadow:0 12px 32px rgba(0,0,0,.28);text-align:left}",
+      ".pf-restart-pop-title{font-size:12px;font-weight:600;line-height:1.5;color:var(--dsw-alias-label-primary)}",
+      ".pf-restart-pop-note{font-size:11px;line-height:1.6;color:var(--dsw-alias-label-secondary);word-break:break-word}",
+      ".pf-restart-pop-actions{display:flex;justify-content:flex-end;gap:6px}",
+      ".pf-restart-cancel{appearance:none;border-radius:7px;padding:4px 10px;font-size:12px;line-height:1.4;cursor:pointer;white-space:nowrap}",
+      ".pf-restart-cancel{border:1px solid var(--dsw-alias-border-l2);background:transparent;color:var(--dsw-alias-label-primary)}",
+      ".pf-restart-cancel:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary) 8%,transparent)}",
+      ".pf-restart-dock{position:absolute;right:16px;bottom:16px;z-index:20;pointer-events:auto;animation:pf-fade-in .24s ease}",
+      ".pf-restart-dock .pf-restart-btn{border-radius:999px;padding:9px 15px 9px 12px;font-size:12px;font-weight:500;background:var(--dsw-alias-bg-overlay);box-shadow:0 6px 20px rgba(0,0,0,.18)}",
+      ".pf-restart-dock .pf-restart-btn:hover{box-shadow:0 10px 26px rgba(0,0,0,.22)}",
+      ".pf-restart-dock .pf-restart-pop{top:auto;right:0;bottom:calc(100% + 10px)}",
+      ".pf-drawer-body{flex:1 1 auto;overflow:auto;padding:12px 14px 74px}",
       ".pf-root{display:flex;flex-direction:column;gap:12px;color:var(--dsw-alias-label-primary);font:inherit}",
       ".pf-head{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}",
       ".pf-head-text{display:flex;flex-direction:column;gap:4px;min-width:160px;flex:1 1 180px}",
@@ -2288,6 +2315,219 @@ window.__ModuleLoader__.load({
       );
     }
 
+    // ── 一键重启 ──────────────────────────────────────────────────────
+    // 按钮跑在 Harness 进程内部，关不掉自己也拉不活自己，所以只负责“叫一下”宿主：
+    // 宿主那半边起一个脱离进程树的 PowerShell（restart.ps1）去关旧实例、拉新实例。
+    var RESTART_URL = "/plugins-folders/restart";
+    var PING_URL = "/plugins-folders/ping";
+
+    // 宿主先把窗口关掉、必要时强杀，再拉起新实例，全程可能二十多秒；
+    // 所以轮询必须“先看到旧实例断掉、再看到新实例回来”才刷新页面，
+    // 否则会在旧实例还活着的时候刷回去，然后页面跟着旧实例一起黑掉。
+    var RESTART_SETTLE_MS = 4000;
+    var PING_INTERVAL_MS = 1500;
+    var PING_ATTEMPTS = 90;
+
+    function restartGlyph() {
+      return h(
+        "svg",
+        {
+          width: 13,
+          height: 13,
+          viewBox: "0 0 16 16",
+          fill: "none",
+          "aria-hidden": true,
+          style: { flex: "none" },
+        },
+        h("path", {
+          d: "M13.4 8a5.4 5.4 0 1 1-1.58-3.82",
+          stroke: "currentColor",
+          strokeWidth: 1.6,
+          strokeLinecap: "round",
+        }),
+        h("path", {
+          d: "M13.5 1.7v3.2h-3.2",
+          stroke: "currentColor",
+          strokeWidth: 1.6,
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+        })
+      );
+    }
+
+    function requestRestart() {
+      return fetch(RESTART_URL, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{}",
+        cache: "no-store",
+        credentials: "same-origin",
+      }).then(function (response) {
+        return response
+          .json()
+          .catch(function () {
+            return null;
+          })
+          .then(function (payload) {
+            if (!response.ok) {
+              var reason = payload && payload.error ? payload.error : "HTTP " + response.status;
+              throw new Error(reason);
+            }
+            return payload || {};
+          });
+      });
+    }
+
+    function pingHost() {
+      return fetch(PING_URL, { cache: "no-store", credentials: "same-origin" }).then(function (
+        response
+      ) {
+        return response.ok;
+      });
+    }
+
+    function RestartButton() {
+      var copy = text();
+      var phaseState = useState("idle");
+      var phase = phaseState[0];
+      var setPhase = phaseState[1];
+      var errorState = useState("");
+      var error = errorState[0];
+      var setError = errorState[1];
+      var wrapRef = useRef(null);
+
+      // 弹层点外面 / 按 Esc 关掉
+      useEffect(
+        function () {
+          if (phase !== "failed") return undefined;
+          var onDown = function (event) {
+            if (wrapRef.current && !wrapRef.current.contains(event.target)) setPhase("idle");
+          };
+          var onKey = function (event) {
+            if (event.key === "Escape") setPhase("idle");
+          };
+          document.addEventListener("mousedown", onDown, true);
+          document.addEventListener("keydown", onKey, true);
+          return function () {
+            document.removeEventListener("mousedown", onDown, true);
+            document.removeEventListener("keydown", onKey, true);
+          };
+        },
+        [phase]
+      );
+
+      // 重启中：等旧实例真的断掉，再轮询到新实例，然后刷新页面
+      useEffect(
+        function () {
+          if (phase !== "running") return undefined;
+          var attempts = 0;
+          var timer = null;
+          var sawDown = false;
+          var settle = setTimeout(function () {
+            timer = setInterval(function () {
+              attempts += 1;
+              if (attempts > PING_ATTEMPTS) {
+                clearInterval(timer);
+                setError(copy.restartTimeout);
+                setPhase("failed");
+                return;
+              }
+              pingHost()
+                .then(function (alive) {
+                  if (!alive) {
+                    sawDown = true;
+                    return;
+                  }
+                  if (!sawDown) return;
+                  clearInterval(timer);
+                  window.location.reload();
+                })
+                .catch(function () {
+                  // 连不上也算一次“断掉”，等它回来即可
+                  sawDown = true;
+                });
+            }, PING_INTERVAL_MS);
+          }, RESTART_SETTLE_MS);
+          return function () {
+            clearTimeout(settle);
+            if (timer) clearInterval(timer);
+          };
+        },
+        [phase]
+      );
+
+      function fire() {
+        setError("");
+        setPhase("running");
+        requestRestart()
+          .then(function () {
+            /* 后续交给轮询 */
+          })
+          .catch(function (failure) {
+            setError(String((failure && failure.message) || failure));
+            setPhase("failed");
+          });
+      }
+
+      var busy = phase === "running";
+      var children = [
+        h(
+          "button",
+          {
+            key: "btn",
+            type: "button",
+            className: "pf-restart-btn" + (busy ? " is-busy" : ""),
+            title: copy.restart,
+            disabled: busy,
+            onClick: function (event) {
+              if (event && typeof event.stopPropagation === "function") event.stopPropagation();
+              if (busy) return;
+              fire();
+            },
+          },
+          restartGlyph(),
+          h("span", null, busy ? copy.restartBusy : copy.restart)
+        ),
+      ];
+
+      if (busy) {
+        children.push(
+          h(
+            "div",
+            { key: "pop", className: "pf-restart-pop", role: "status" },
+            h("div", { className: "pf-restart-pop-title" }, copy.restartBusy),
+            h("div", { className: "pf-restart-pop-note" }, copy.restartWaiting)
+          )
+        );
+      } else if (phase === "failed") {
+        children.push(
+          h(
+            "div",
+            { key: "pop", className: "pf-restart-pop", role: "alert" },
+            h("div", { className: "pf-restart-pop-title" }, copy.restartFailed),
+            h("div", { className: "pf-restart-pop-note" }, error || "—"),
+            h(
+              "div",
+              { className: "pf-restart-pop-actions" },
+              h(
+                "button",
+                {
+                  type: "button",
+                  className: "pf-restart-cancel",
+                  onClick: function () {
+                    setPhase("idle");
+                  },
+                },
+                copy.close
+              )
+            )
+          )
+        );
+      }
+
+      return h("div", { className: "pf-restart", ref: wrapRef }, children);
+    }
+
     // ── 浮动入口 + 抽屉 ──────────────────────────────────────────────
     function PluginsFoldersLauncher() {
       var copy = text();
@@ -2344,6 +2584,7 @@ window.__ModuleLoader__.load({
             { className: "pf-drawer-head" },
             h("span", { style: { display: "inline-flex" }, "aria-hidden": true }, folderGlyph()),
             h("span", { className: "pf-drawer-title" }, copy.title),
+            h("span", { style: { flex: "1 1 auto" } }),
             h(
               "button",
               {
@@ -2358,9 +2599,21 @@ window.__ModuleLoader__.load({
               closeIcon()
             )
           ),
-          h("div", { className: "pf-drawer-body" }, h(FoldersPanel, null))
+          h("div", { className: "pf-drawer-body" }, h(FoldersPanel, null)),
+          h(RestartDock, null)
         )
       );
+    }
+
+    /**
+     * 抽屉右下角的重启按钮。
+     *
+     * 以前它挤在抽屉标题栏里跟标题抢位置，头部一被裁就点不着。现在钉在抽屉
+     * 自己的右下角（`position:absolute` 相对 `.pf-drawer`），滚列表也不跟着跑，
+     * 确认／进行中／失败的浮层朝上弹，不会被抽屉底边切掉。
+     */
+    function RestartDock() {
+      return h("div", { className: "pf-restart-dock" }, h(RestartButton, null));
     }
 
     function LauncherSafe() {

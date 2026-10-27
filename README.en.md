@@ -12,7 +12,8 @@ A folder layer for the **Plugins** page of DeepSeek Harness: sort installed plug
 4. **Search** — filter by plugin name or description across all folders.
 5. **Long-press drag reordering** — hold for ~320 ms to pick up a plugin or an entire folder and drop it where you want it. Order is stored with the grouping.
 6. **Right-click uninstall with records** — right-click any row to uninstall the plugin (the folders plugin itself refuses to uninstall itself). Removed plugins are recorded under "Uninstalled" and can be **reinstalled in one click** from their original install source, or the record can be dropped.
-7. **Follows the UI language** — ships Chinese and English copy, switched with the host locale.
+7. **One-click Harness restart** — a fixed button in the panel corner quits the running instance and starts it again; the page reloads once the new instance answers.
+8. **Follows the UI language** — ships Chinese and English copy, switched with the host locale.
 
 ## Install
 
