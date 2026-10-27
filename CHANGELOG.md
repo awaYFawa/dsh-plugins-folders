@@ -16,6 +16,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), version
 - 从不可达的确认浮层分支（点击早已直接触发重启）、其文案与 `.pf-restart-ok` 样式。
 - `restart.ps1` 里已证伪的三级回退与 `Get-ReplayCommandLine` 复刻命令行逻辑。
 
+### Docs
+
+- `README.md` / `README.en.md` 互加语言切换行；`package.json` 描述与 GitHub 仓库简介改为中英双语。
+
 ## [1.2.1] — 2025-10-26
 
 ### Changed
