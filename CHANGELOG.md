@@ -3,6 +3,18 @@
 All notable changes to **dsh-plugins-folders** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioning follows [SemVer](https://semver.org/).
 
+## [1.2.4] — 2025-11-03
+
+### Changed
+
+- 「插件分组」浮动入口（`shell.overlay` 里的浮标）改成**可拖动**：按住拖到任意位置，松手记住坐标（`localStorage` 键 `dsh-plugins-folders:launcher-pos`），下次打开还在那儿。
+  - 默认位置仍是右下角；拖出视口会被夹回来。
+  - 拖动超过 4px 才算拖动，松手不会误开面板。
+
+### Reverted
+
+- 撤销 1.2.3 对「重启 Harness」按钮的拖动改造：它回到面板右下角固定不动（`position: absolute; right: 16px; bottom: 16px`）。
+
 ## [1.2.3] — 2025-11-03
 
 ### Changed
