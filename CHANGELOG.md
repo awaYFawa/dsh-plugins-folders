@@ -3,6 +3,15 @@
 All notable changes to **dsh-plugins-folders** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioning follows [SemVer](https://semver.org/).
 
+## [1.2.3] — 2025-11-03
+
+### Changed
+
+- 「重启 Harness」按钮改成可拖动：按住按钮拖到面板里任意位置，松手记住坐标（`localStorage` 键 `dsh-plugins-folders:restart-dock`），下次打开还在那儿。
+  - 默认位置仍是面板右下角；拖出可视区会被夹回面板范围内。
+  - 拖动超过 4px 才算拖动，松手不会误触发重启（拖动结束后的那一次 click 被吞掉）。
+  - 拖到靠上位置（`top < 150`）时，进行中／失败的浮层改为朝下弹，不会顶出面板。
+
 ## [1.2.2] — 2025-10-27
 
 ### Changed

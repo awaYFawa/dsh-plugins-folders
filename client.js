@@ -464,7 +464,9 @@ window.__ModuleLoader__.load({
       ".pf-restart-cancel{appearance:none;border-radius:7px;padding:4px 10px;font-size:12px;line-height:1.4;cursor:pointer;white-space:nowrap}",
       ".pf-restart-cancel{border:1px solid var(--dsw-alias-border-l2);background:transparent;color:var(--dsw-alias-label-primary)}",
       ".pf-restart-cancel:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary) 8%,transparent)}",
-      ".pf-restart-dock{position:absolute;right:16px;bottom:16px;z-index:20;pointer-events:auto;animation:pf-fade-in .24s ease}",
+      ".pf-restart-dock{position:absolute;right:16px;bottom:16px;z-index:20;pointer-events:auto;touch-action:none;user-select:none;cursor:grab;animation:pf-fade-in .24s ease}",
+      ".pf-restart-dock:active{cursor:grabbing}",
+      ".pf-restart-dock.is-flip .pf-restart-pop{top:calc(100% + 10px);bottom:auto}",
       ".pf-restart-dock .pf-restart-btn{border-radius:999px;padding:9px 15px 9px 12px;font-size:12px;font-weight:500;background:var(--dsw-alias-bg-overlay);box-shadow:0 6px 20px rgba(0,0,0,.18)}",
       ".pf-restart-dock .pf-restart-btn:hover{box-shadow:0 10px 26px rgba(0,0,0,.22)}",
       ".pf-restart-dock .pf-restart-pop{top:auto;right:0;bottom:calc(100% + 10px)}",
@@ -2605,15 +2607,112 @@ window.__ModuleLoader__.load({
       );
     }
 
-    /**
-     * 抽屉右下角的重启按钮。
-     *
-     * 以前它挤在抽屉标题栏里跟标题抢位置，头部一被裁就点不着。现在钉在抽屉
-     * 自己的右下角（`position:absolute` 相对 `.pf-drawer`），滚列表也不跟着跑，
-     * 确认／进行中／失败的浮层朝上弹，不会被抽屉底边切掉。
-     */
+    // ── 可拖动的重启入口 ─────────────────────────────────────────────
+    // 默认停在抽屉右下角，按住拖到任意位置，坐标存本地。拖动超过 4px 就不当点击，
+    // 免得手一抖就重启。
+    var DOCK_KEY = "dsh-plugins-folders:restart-dock";
+
+    function readDockPos() {
+      try {
+        var raw = window.localStorage.getItem(DOCK_KEY);
+        var saved = raw ? JSON.parse(raw) : null;
+        if (saved && typeof saved.left === "number" && typeof saved.top === "number") {
+          return { left: saved.left, top: saved.top };
+        }
+      } catch (error) {
+        /* 坏数据就当没存过 */
+      }
+      return null;
+    }
+
     function RestartDock() {
-      return h("div", { className: "pf-restart-dock" }, h(RestartButton, null));
+      var posState = useState(readDockPos);
+      var pos = posState[0];
+      var setPos = posState[1];
+      var dockRef = useRef(null);
+      var dragRef = useRef(null);
+      var posRef = useRef(pos);
+      var movedRef = useRef(false);
+      posRef.current = pos;
+
+      function clamp(value, max) {
+        return Math.max(0, Math.min(value, Math.max(0, max)));
+      }
+
+      function onMove(event) {
+        var drag = dragRef.current;
+        if (!drag) return;
+        if (
+          !drag.moved &&
+          Math.abs(event.clientX - drag.startX) + Math.abs(event.clientY - drag.startY) < 4
+        ) {
+          return;
+        }
+        drag.moved = true;
+        setPos({
+          left: Math.round(clamp(event.clientX - drag.offsetX - drag.box.left, drag.box.width - drag.width)),
+          top: Math.round(clamp(event.clientY - drag.offsetY - drag.box.top, drag.box.height - drag.height)),
+        });
+        if (event.cancelable) event.preventDefault();
+      }
+
+      function onUp() {
+        var drag = dragRef.current;
+        dragRef.current = null;
+        window.removeEventListener("pointermove", onMove, true);
+        window.removeEventListener("pointerup", onUp, true);
+        document.removeEventListener("pointercancel", onUp, true);
+        if (!drag || !drag.moved) return;
+        movedRef.current = true;
+        try {
+          if (posRef.current) window.localStorage.setItem(DOCK_KEY, JSON.stringify(posRef.current));
+        } catch (error) {
+          /* 存不了就只对本次会话生效 */
+        }
+      }
+
+      function onPointerDown(event) {
+        if (event.button !== undefined && event.button !== 0) return;
+        var node = dockRef.current;
+        if (!node) return;
+        movedRef.current = false;
+        var rect = node.getBoundingClientRect();
+        var host = node.offsetParent;
+        var box = host
+          ? host.getBoundingClientRect()
+          : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+        dragRef.current = {
+          startX: event.clientX,
+          startY: event.clientY,
+          offsetX: event.clientX - rect.left,
+          offsetY: event.clientY - rect.top,
+          width: rect.width,
+          height: rect.height,
+          box: box,
+          moved: false,
+        };
+        window.addEventListener("pointermove", onMove, true);
+        window.addEventListener("pointerup", onUp, true);
+        document.addEventListener("pointercancel", onUp, true);
+      }
+
+      var style = pos ? { left: pos.left + "px", top: pos.top + "px", right: "auto", bottom: "auto" } : undefined;
+
+      return h(
+        "div",
+        {
+          className: "pf-restart-dock" + (pos && pos.top < 150 ? " is-flip" : ""),
+          ref: dockRef,
+          style: style,
+          onPointerDown: onPointerDown,
+          onClickCapture: function (event) {
+            if (!movedRef.current) return;
+            event.stopPropagation();
+            event.preventDefault();
+          },
+        },
+        h(RestartButton, null)
+      );
     }
 
     function LauncherSafe() {
