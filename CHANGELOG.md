@@ -3,6 +3,13 @@
 All notable changes to **dsh-plugins-folders** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioning follows [SemVer](https://semver.org/).
 
+## [1.2.5] — 2025-11-03
+
+### Fixed
+
+- 全屏时把「插件分组」浮标拖到角落，再缩小窗口浮标会跑到可视区外（看起来像消失了）。现在窗口尺寸一变就把它按按钮实际尺寸夹回视口内，并把修正后的坐标写回 `localStorage`；面板开关切换时也重新校一次。
+- 「插件分组」文案强制单行（`white-space: nowrap`），浮标再窄也不换行。
+
 ## [1.2.4] — 2025-11-03
 
 ### Changed

@@ -437,7 +437,7 @@ window.__ModuleLoader__.load({
 
     // ── 样式（注入 document.head）────────────────────────────────────
     var CSS = [
-      ".pf-launcher{position:fixed;right:20px;bottom:20px;z-index:70;pointer-events:auto;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-overlay);color:var(--dsw-alias-label-primary);border-radius:999px;padding:8px 14px 8px 12px;font-size:12px;font-weight:500;line-height:1.4;cursor:grab;touch-action:none;user-select:none;box-shadow:0 6px 20px rgba(0,0,0,.16);transition:background-color .2s ease,transform .2s cubic-bezier(.22,1,.36,1),box-shadow .2s ease}",
+      ".pf-launcher{position:fixed;right:20px;bottom:20px;z-index:70;pointer-events:auto;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-overlay);color:var(--dsw-alias-label-primary);border-radius:999px;padding:8px 14px 8px 12px;font-size:12px;font-weight:500;line-height:1.4;white-space:nowrap;cursor:grab;touch-action:none;user-select:none;box-shadow:0 6px 20px rgba(0,0,0,.16);transition:background-color .2s ease,transform .2s cubic-bezier(.22,1,.36,1),box-shadow .2s ease}",
       ".pf-launcher:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary) 8%,var(--dsw-alias-bg-overlay));transform:translateY(-1px);box-shadow:0 10px 26px rgba(0,0,0,.2)}",
       ".pf-launcher:active{transform:translateY(0) scale(.98)}",
       ".pf-launcher svg{color:var(--dsw-alias-brand-primary);flex:none}",
@@ -2563,6 +2563,29 @@ window.__ModuleLoader__.load({
       function clampAxis(value, max) {
         return Math.max(0, Math.min(value, Math.max(0, max)));
       }
+
+      // 全屏时把浮标拖到角落，再缩窗口它就跑出可视区了：窗口一变就夹回来并落盘。
+      useEffect(function () {
+        function fitInside() {
+          var current = posRef.current;
+          if (!current) return;
+          var node = btnRef.current;
+          var left = Math.round(clampAxis(current.left, window.innerWidth - (node ? node.offsetWidth : 0)));
+          var top = Math.round(clampAxis(current.top, window.innerHeight - (node ? node.offsetHeight : 0)));
+          if (left === current.left && top === current.top) return;
+          setPos({ left: left, top: top });
+          try {
+            window.localStorage.setItem(LAUNCHER_KEY, JSON.stringify({ left: left, top: top }));
+          } catch (error) {
+            /* 存不了就只对本次会话生效 */
+          }
+        }
+        fitInside();
+        window.addEventListener("resize", fitInside);
+        return function () {
+          window.removeEventListener("resize", fitInside);
+        };
+      }, [open]);
 
       function onDragMove(event) {
         var drag = dragRef.current;
