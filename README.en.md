@@ -47,7 +47,7 @@ Grouping data lives in the browser's `localStorage` and survives plugin removal;
 
 ## Usage
 
-Open the Plugins page: a "Plugin folders" launcher appears from the `shell.overlay` slot (order 20) — **drag it anywhere and the spot is remembered; shrinking the window pulls it back into view**. Click it to open the panel.
+Open the Plugins page: a "Plugin folders" launcher appears from the `shell.overlay` slot (order 20) — **drag it anywhere and the spot is remembered; shrinking the window pulls it back into view, and it refuses to sit under the window titlebar (that strip is the OS drag region, so clicks would never reach it)**. Click it to open the panel.
 
 | Task | How |
 |---|---|

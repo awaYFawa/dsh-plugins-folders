@@ -2532,6 +2532,21 @@ window.__ModuleLoader__.load({
     // 浮标默认钉在右下角，按住可以拖到任意位置，坐标存本地。
     // 拖动超过 4px 才算数，松手不会误开面板。
     var LAUNCHER_KEY = "dsh-plugins-folders:launcher-pos";
+    // 顶部这段是宿主的标题栏（Windows 的窗口按钮也在那儿），浮标压上去会被窗口拖拽区吃掉，
+    // 点不动，所以拖到多高都留出这条缝。宿主用 --dsh-windows-titlebar-height 公布高度，
+    // 没有这个变量就按 56px 兜底。
+    var LAUNCHER_TOP_INSET = 56;
+
+    function launcherTopInset() {
+      try {
+        var raw = window.getComputedStyle(document.documentElement).getPropertyValue("--dsh-windows-titlebar-height");
+        var parsed = parseFloat(raw);
+        if (isFinite(parsed) && parsed > 0) return Math.round(parsed) + 8;
+      } catch (error) {
+        /* 读不到就用兜底值 */
+      }
+      return LAUNCHER_TOP_INSET;
+    }
 
     function readLauncherPos() {
       try {
@@ -2564,6 +2579,12 @@ window.__ModuleLoader__.load({
         return Math.max(0, Math.min(value, Math.max(0, max)));
       }
 
+      function clampTop(value, max) {
+        var upper = Math.max(0, max);
+        var lower = Math.min(launcherTopInset(), upper);
+        return Math.max(lower, Math.min(value, upper));
+      }
+
       // 全屏时把浮标拖到角落，再缩窗口它就跑出可视区了：窗口一变就夹回来并落盘。
       useEffect(function () {
         function fitInside() {
@@ -2571,7 +2592,7 @@ window.__ModuleLoader__.load({
           if (!current) return;
           var node = btnRef.current;
           var left = Math.round(clampAxis(current.left, window.innerWidth - (node ? node.offsetWidth : 0)));
-          var top = Math.round(clampAxis(current.top, window.innerHeight - (node ? node.offsetHeight : 0)));
+          var top = Math.round(clampTop(current.top, window.innerHeight - (node ? node.offsetHeight : 0)));
           if (left === current.left && top === current.top) return;
           setPos({ left: left, top: top });
           try {
@@ -2599,7 +2620,7 @@ window.__ModuleLoader__.load({
         drag.moved = true;
         setPos({
           left: Math.round(clampAxis(event.clientX - drag.offsetX, window.innerWidth - drag.width)),
-          top: Math.round(clampAxis(event.clientY - drag.offsetY, window.innerHeight - drag.height)),
+          top: Math.round(clampTop(event.clientY - drag.offsetY, window.innerHeight - drag.height)),
         });
         if (event.cancelable) event.preventDefault();
       }

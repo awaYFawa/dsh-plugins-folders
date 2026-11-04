@@ -3,6 +3,12 @@
 All notable changes to **dsh-plugins-folders** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioning follows [SemVer](https://semver.org/).
 
+## [1.2.6] — 2025-11-04
+
+### Fixed
+
+- 浮标拖到顶部（宿主的标题栏、Windows 窗口按钮那一条）会点不动——那块是窗口拖拽区，鼠标事件被系统吃掉。现在上边界留出一条安全缝：拖动与窗口变化时都按 `--dsh-windows-titlebar-height`（宿主公布的高度，+8px 余量，读不到就 56px）夹住，浮标不会压进标题栏。
+
 ## [1.2.5] — 2025-11-03
 
 ### Fixed
