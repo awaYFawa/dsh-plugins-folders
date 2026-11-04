@@ -532,9 +532,13 @@ window.__ModuleLoader__.load({
       ".pf-switch[aria-checked='true']::after{transform:translateX(15px)}",
       ".pf-switch:hover{filter:brightness(1.05)}",
       ".pf-switch:disabled{opacity:.45;cursor:default}",
-      ".pf-switch.pf-switch-sm{width:26px;height:15px}",
-      ".pf-switch.pf-switch-sm::after{width:10px;height:10px;top:2.5px;left:2.5px}",
-      ".pf-switch.pf-switch-sm[aria-checked='true']::after{transform:translateX(11px)}",
+      ".pf-group-check{flex:none;width:18px;height:18px;padding:0;border:1.5px solid color-mix(in srgb,var(--dsw-alias-label-primary) 42%,transparent);border-radius:5px;background:transparent;position:relative;cursor:pointer;transition:border-color .18s ease,background-color .18s ease}",
+      ".pf-group-check:hover{border-color:var(--dsw-alias-brand-primary)}",
+      ".pf-group-check::after{content:'';position:absolute;left:50%;top:50%;width:10px;height:10px;border-radius:3px;background:var(--dsw-alias-brand-primary);transform:translate(-50%,-50%) scale(0);transition:transform .16s cubic-bezier(.22,1,.36,1)}",
+      ".pf-group-check[data-state='some']::after{transform:translate(-50%,-50%) scale(1)}",
+      ".pf-group-check[data-state='all']{background:var(--dsw-alias-brand-primary);border-color:var(--dsw-alias-brand-primary)}",
+      ".pf-group-check[data-state='all']::after{width:10px;height:5px;border-radius:0;background:transparent;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:translate(-50%,-60%) rotate(-45deg) scale(1)}",
+      ".pf-group-check:disabled{opacity:.45;cursor:default}",
       ".pf-root .pf-picker{appearance:none;display:inline-flex;align-items:center;gap:5px;justify-content:space-between;border:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);border-radius:8px;padding:4px 7px;font-size:11px;line-height:1.5;max-width:104px;cursor:pointer;outline:none;transition:background-color .16s ease,border-color .16s ease}",
       ".pf-root .pf-picker:hover{background:color-mix(in srgb,var(--dsw-alias-label-primary) 8%,transparent);border-color:var(--dsw-alias-border-l2)}",
       ".pf-root .pf-picker[data-open='true']{border-color:var(--dsw-alias-brand-primary)}",
@@ -1631,6 +1635,11 @@ window.__ModuleLoader__.load({
           manageable.every(function (member) {
             return member.enabled === true;
           });
+        var someOn =
+          !allOn &&
+          manageable.some(function (member) {
+            return member.enabled === true;
+          });
         return h(
           "section",
           { key: groupId, className: "pf-card", "data-open": open ? "true" : "false" },
@@ -1668,9 +1677,10 @@ window.__ModuleLoader__.load({
             h("span", { style: { flex: "1 1 auto" } }),
             h("button", {
               type: "button",
-              className: "pf-switch pf-switch-sm",
-              role: "switch",
-              "aria-checked": allOn ? "true" : "false",
+              className: "pf-group-check",
+              role: "checkbox",
+              "data-state": allOn ? "all" : someOn ? "some" : "none",
+              "aria-checked": allOn ? "true" : someOn ? "mixed" : "false",
               disabled: manageable.length === 0 || scan.readOnly,
               title: allOn ? copy.groupOff : copy.groupOn,
               "aria-label": allOn ? copy.groupOff : copy.groupOn,

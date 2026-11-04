@@ -9,7 +9,7 @@ A folder layer for the **Plugins** page of DeepSeek Harness: sort installed plug
 ## Features
 
 1. **Folders** — create, rename and delete folders; move any installed plugin into one. Anything unassigned lands in "Unclassified" and can be moved later.
-2. **Per-plugin and per-group switches** — each row has its own switch wired to the real `remote.pluginManager.setBundleEnabled`; a group switch flips the whole group. Plugins locked by a higher-level config are marked read-only with the reason, instead of pretending to work.
+2. **Per-plugin and per-group switches (tri-state)** — each row has its own switch wired to the real `remote.pluginManager.setBundleEnabled`; the group header carries a checkbox that reads empty (all off), a rounded square inside an empty box (partially on), or a filled box with a tick (all on), and flips the whole group. Plugins locked by a higher-level config are marked read-only with the reason, instead of pretending to work.
 3. **Batch operations** — select many rows, then "Move to…" another folder or toggle them together. Every change can be **undone**.
 4. **Search** — filter by plugin name or description across all folders.
 5. **Long-press drag reordering** — hold for ~320 ms to pick up a plugin or an entire folder and drop it where you want it. Order is stored with the grouping.

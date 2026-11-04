@@ -3,6 +3,20 @@
 All notable changes to **dsh-plugins-folders** are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versioning follows [SemVer](https://semver.org/).
 
+## [1.2.7] — 2025-11-04
+
+### Changed
+
+- 分组开关改成三态勾选框（`role="checkbox"`，`aria-checked` 支持 `mixed`），一眼看出这组是「全开 / 部分开 / 全关」：
+  - 全关 = 空方框；
+  - 部分开 = 空方框中间一个占比较大的圆角小方块；
+  - 全开 = 品牌色实心方框 + 白色勾。
+- 点击行为不变：不是全开就整组打开，已全开则整组关闭。
+
+### Removed
+
+- 不再使用的 `.pf-switch-sm` 三条样式（行内插件开关仍用 `.pf-switch`）。
+
 ## [1.2.6] — 2025-11-04
 
 ### Fixed
